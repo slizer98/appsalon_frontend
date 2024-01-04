@@ -9,8 +9,23 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
-    }, 
+      component: HomeView,
+      beforeEnter: async (to, from, next) => {
+        try {
+          const { data } = await AuthAPI.auth();
+    
+          if (data.admin) {
+            next({ name: 'admin' });
+          } else if (data.loggedIn) {
+            next({ name: 'appointments' });
+          } else {
+            next();
+          }
+        } catch (error) {
+          next({ name: 'login' });
+        }
+      }
+    },
     {
       path: '/auth/admin',
       name: 'admin',
